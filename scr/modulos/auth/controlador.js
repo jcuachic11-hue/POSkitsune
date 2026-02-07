@@ -36,3 +36,4 @@ async function login(req, res) {
     res.status(500).json({ error: 'Error interno en login' });
   }
 }
+module.exports = { login };
