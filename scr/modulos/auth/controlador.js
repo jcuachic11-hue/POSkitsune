@@ -20,7 +20,7 @@ async function login(req, res) {
     const passwordBD = String(user.password).trim();
 
     if (usuario.trim() !== usuarioBD || password.trim() !== passwordBD) {
-      return res.status(401).json({ error: 'Contraseña incorrecta' });
+      return res.status(401).json({ error: 'Login incorrecto' });
     }
 
     // Generar token
