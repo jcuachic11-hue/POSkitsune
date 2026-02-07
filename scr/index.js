@@ -8,8 +8,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 require('./bd/mysql');
 console.log("Cargando MySQL...");
-require('./bd/mysql');
-console.log("MySQL cargado");
 
 
 
