@@ -1,9 +1,8 @@
-const conexion = require('../../bd/mysql');
-const jwt = require('jsonwebtoken');
-
 async function login(req, res) {
   const { usuario, password } = req.body;
   try {
+    console.log("Body recibido:", req.body);
+
     const [rows] = await conexion.query(
       'SELECT * FROM usuarios WHERE usuario = ?',
       [usuario]
@@ -14,16 +13,17 @@ async function login(req, res) {
     }
 
     const user = rows[0];
+    console.log("Usuario en BD:", user.usuario);
+    console.log("Password en BD:", user.password);
 
-    // Normalizar valores para evitar espacios o tipos raros
     const usuarioBD = String(user.usuario).trim();
     const passwordBD = String(user.password).trim();
 
     if (usuario.trim() !== usuarioBD || password.trim() !== passwordBD) {
+      console.log("Comparación fallida:", usuario.trim(), password.trim(), "vs", usuarioBD, passwordBD);
       return res.status(401).json({ error: 'Login incorrecto' });
     }
 
-    // Generar token
     const token = jwt.sign(
       { id: user.id, usuario: usuarioBD, rol: user.rol },
       process.env.JWT_SECRET,
@@ -36,5 +36,3 @@ async function login(req, res) {
     res.status(500).json({ error: 'Error interno en login' });
   }
 }
-
-module.exports = { login };
