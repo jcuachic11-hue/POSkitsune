@@ -39,9 +39,15 @@ async function login(req, res) {
 
     res.json({ mensaje: 'Login exitoso', token });
   } catch (error) {
-    console.error('Error de login:', error.message, error.stack);
-    res.status(500).json({ error: 'Error interno en login' });
+  console.error('Error de login:', error);
+  res.status(500).json({
+    error: 'Error interno en login',
+    detalle: error.message || 'Sin mensaje'
+  });
+
   }
+
+
 }
 
 module.exports = { login };
