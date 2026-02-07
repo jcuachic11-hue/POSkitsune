@@ -3,8 +3,15 @@ const jwt = require('jsonwebtoken');
 
 async function login(req, res) {
   const { usuario, password } = req.body;
+
   try {
     console.log("Body recibido crudo:", req.body);
+
+    // Validación temprana del body
+    if (!usuario || !password) {
+      console.log("Body incompleto:", req.body);
+      return res.status(400).json({ error: "Body incompleto", body: req.body });
+    }
 
     const [rows] = await conexion.query(
       'SELECT * FROM usuarios WHERE usuario = ?',
@@ -17,6 +24,7 @@ async function login(req, res) {
     }
 
     const user = rows[0];
+    console.log("Keys de fila BD:", Object.keys(user)); // 👈 muestra columnas reales
     console.log("Fila completa de BD:", user);
     console.log("Usuario en BD:", user.usuario);
     console.log("Password en BD:", user.password);
@@ -39,15 +47,12 @@ async function login(req, res) {
 
     res.json({ mensaje: 'Login exitoso', token });
   } catch (error) {
-  console.error('Error de login:', error);
-  res.status(500).json({
-    error: 'Error interno en login',
-    detalle: error.message || 'Sin mensaje'
-  });
-
+    console.error('Error de login:', error);
+    res.status(500).json({
+      error: 'Error interno en login',
+      detalle: error.message || 'Sin mensaje'
+    });
   }
-
-
 }
 
 module.exports = { login };
