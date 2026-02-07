@@ -36,7 +36,7 @@ const ventas = require('./modulos/ventas/rutas');
 
 
 
-app.use('/', auth);
+app.use('/auth', auth);
 app.use('/productos', productos);
 app.use('/usuarios', usuarios);
 app.use('/ventas', ventas);
