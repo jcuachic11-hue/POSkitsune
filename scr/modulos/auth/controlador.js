@@ -15,13 +15,17 @@ async function login(req, res) {
 
     const user = rows[0];
 
-    if (password !== user.password) {
+    // Normalizar valores para evitar espacios o tipos raros
+    const usuarioBD = String(user.usuario).trim();
+    const passwordBD = String(user.password).trim();
+
+    if (usuario.trim() !== usuarioBD || password.trim() !== passwordBD) {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    //token 
+    // Generar token
     const token = jwt.sign(
-      { id: user.id, usuario: user.usuario, rol: user.rol },
+      { id: user.id, usuario: usuarioBD, rol: user.rol },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
