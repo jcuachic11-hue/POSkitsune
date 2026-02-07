@@ -50,7 +50,8 @@ async function login(req, res) {
     console.error('Error de login:', error);
     res.status(500).json({
       error: 'Error interno en login',
-      detalle: error.message || 'Sin mensaje'
+      detalle: error.message || 'Sin mensaje',
+      extra: error // 👈 devuelve el objeto de error completo
     });
   }
 }
