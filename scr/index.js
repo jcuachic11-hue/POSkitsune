@@ -1,53 +1,28 @@
-// Cargar variables de entorno desde .env
-//require('dotenv').config();
-console.log("Cargando index.js...");
+// scr/bd/mysql.js
+const mysql = require('mysql2');
 
+// Imprimir valores crudos para depuración
+console.log("MYSQLHOST:", JSON.stringify(process.env.MYSQLHOST));
+console.log("MYSQLPORT:", JSON.stringify(process.env.MYSQLPORT));
+console.log("MYSQLUSER:", JSON.stringify(process.env.MYSQLUSER));
+console.log("MYSQLPASSWORD:", JSON.stringify(process.env.MYSQLPASSWORD));
+console.log("MYSQLDATABASE raw:", JSON.stringify(process.env.MYSQLDATABASE));
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
-require('./bd/mysql');
-console.log("Cargando MySQL...");
-
-
-
-
-
-const express = require('express');
-const app = express();
-
-app.use(express.json());
-app.use(express.static('scr/publico'));
-
-console.log("Cargando rutas de auth...");
-const auth = require('./modulos/auth/rutas');
-
-console.log("Cargando rutas de productos...");
-const productos = require('./modulos/productos/rutas');
-
-console.log("Cargando rutas de usuarios...");
-const usuarios = require('./modulos/usuarios/rutas');
-
-console.log("Cargando rutas de ventas...");
-const ventas = require('./modulos/ventas/rutas');
-
-
-//const rutas = require('./rutas');
-
-
-
-app.use('/auth', auth);
-app.use('/productos', productos);
-app.use('/usuarios', usuarios);
-app.use('/ventas', ventas);
-
-
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+const connection = mysql.createConnection({
+  host: process.env.MYSQLHOST,
+  port: process.env.MYSQLPORT,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  // trim elimina espacios invisibles al inicio/fin
+  database: process.env.MYSQLDATABASE ? process.env.MYSQLDATABASE.trim() : undefined
 });
 
-//prueba 
-//prueba 2
+connection.connect(err => {
+  if (err) {
+    console.error("Error al conectar a MySQL:", err.message);
+    return;
+  }
+  console.log("Conectado a MySQL correctamente");
+});
+
+module.exports = connection;
