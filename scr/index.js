@@ -1,28 +1,42 @@
-// scr/bd/mysql.js
-const mysql = require('mysql2');
+// scr/index.js
+const express = require('express');
+const app = express();
+const connection = require('./bd/mysql');
 
-// Imprimir valores crudos para depuración
-console.log("MYSQLHOST:", JSON.stringify(process.env.MYSQLHOST));
-console.log("MYSQLPORT:", JSON.stringify(process.env.MYSQLPORT));
-console.log("MYSQLUSER:", JSON.stringify(process.env.MYSQLUSER));
-console.log("MYSQLPASSWORD:", JSON.stringify(process.env.MYSQLPASSWORD));
-console.log("MYSQLDATABASE raw:", JSON.stringify(process.env.MYSQLDATABASE));
+// Middleware para parsear JSON
+app.use(express.json());
 
-const connection = mysql.createConnection({
-  host: process.env.MYSQLHOST,
-  port: process.env.MYSQLPORT,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  // trim elimina espacios invisibles al inicio/fin
-  database: process.env.MYSQLDATABASE ? process.env.MYSQLDATABASE.trim() : undefined
+// Endpoint de prueba para verificar que la app responde en Railway
+app.get('/', (req, res) => {
+  res.send('POSkitsune está corriendo en Railway');
 });
 
-connection.connect(err => {
-  if (err) {
-    console.error("Error al conectar a MySQL:", err.message);
-    return;
-  }
-  console.log("Conectado a MySQL correctamente");
+// Aquí irían tus rutas de login y demás
+app.post('/auth/login', (req, res) => {
+  const { usuario, password } = req.body;
+
+  // Ejemplo básico de consulta a la tabla usuarios
+  connection.query(
+    'SELECT * FROM usuarios WHERE usuario = ? AND password = ?',
+    [usuario, password],
+    (err, results) => {
+      if (err) {
+        console.error('Error en la consulta:', err);
+        return res.status(500).json({ status: 'error', message: 'Error interno' });
+      }
+
+      if (results.length > 0) {
+        // Aquí deberías generar tu JWT
+        res.json({ status: 'success', message: 'Login correcto' });
+      } else {
+        res.status(401).json({ status: 'error', message: 'Credenciales inválidas' });
+      }
+    }
+  );
 });
 
-module.exports = connection;
+// Puerto: Railway inyecta process.env.PORT
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
