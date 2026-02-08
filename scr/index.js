@@ -2,6 +2,8 @@
 const express = require('express');
 const app = express();
 const connection = require('./bd/mysql');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Middleware para parsear JSON
 app.use(express.json());
@@ -11,11 +13,10 @@ app.get('/', (req, res) => {
   res.send('POSkitsune está corriendo en Railway');
 });
 
-// Aquí irían tus rutas de login y demás
+// Endpoint de login con generación de JWT
 app.post('/auth/login', (req, res) => {
   const { usuario, password } = req.body;
 
-  // Ejemplo básico de consulta a la tabla usuarios
   connection.query(
     'SELECT * FROM usuarios WHERE usuario = ? AND password = ?',
     [usuario, password],
@@ -26,8 +27,14 @@ app.post('/auth/login', (req, res) => {
       }
 
       if (results.length > 0) {
-        // Aquí deberías generar tu JWT
-        res.json({ status: 'success', message: 'Login correcto' });
+        // Generar JWT usando la variable de entorno JWT_SECRET
+        const token = jwt.sign(
+          { id: results[0].id, usuario: results[0].usuario, rol: results[0].rol },
+          process.env.JWT_SECRET,
+          { expiresIn: '1h' }
+        );
+
+        res.json({ status: 'success', token });
       } else {
         res.status(401).json({ status: 'error', message: 'Credenciales inválidas' });
       }
