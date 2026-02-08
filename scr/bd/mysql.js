@@ -1,38 +1,20 @@
-const mysql = require("mysql2/promise");
+const mysql = require('mysql2');
+require('dotenv').config();
 
-console.log("MYSQLHOST:", process.env.MYSQLHOST);
-console.log("MYSQLPORT:", process.env.MYSQLPORT);
-console.log("MYSQLUSER:", process.env.MYSQLUSER);
-console.log("MYSQLPASSWORD:", process.env.MYSQLPASSWORD ? "****" : "EMPTY");
-console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+const connection = mysql.createConnection({
+  host: process.env.MYSQLHOST || process.env.DB_HOST,
+  port: process.env.MYSQLPORT || process.env.DB_PORT,
+  user: process.env.MYSQLUSER || process.env.DB_USER,
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD,
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME
+});
 
-let pool;
+connection.connect(err => {
+  if (err) {
+    console.error('Error al conectar a MySQL:', err.message);
+  } else {
+    console.log('Conexión a MySQL exitosa');
+  }
+});
 
-try {
-  pool = mysql.createPool({
-    host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
-    port: process.env.MYSQLPORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-  });
-
-  // Probar conexión sin cerrar el proceso si falla
-  pool.getConnection()
-    .then(conn => {
-      console.log("Connected to MySQL");
-      conn.release();
-    })
-    .catch(err => {
-      console.error("Error al conectar a MySQL:", err.message);
-      // No cerrar el proceso, solo loguear
-    });
-
-} catch (err) {
-  console.error("Error creando el pool MySQL:", err.message);
-}
-
-module.exports = pool;
+module.exports = connection;
