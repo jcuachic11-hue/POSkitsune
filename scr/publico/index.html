@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú Principal</title>
+</head>
+<body>
+  <h2>Menú Principal</h2>
+  <p>Selecciona una opción:</p>
+  <ul>
+    <li><a href="productos.html">Gestión de Productos</a></li>
+    <li><a href="usuarios.html">Gestión de Usuarios</a></li>
+    <li><a href="ventas.html">Módulo de Ventas</a></li>
+
+  </ul>
+
+  <script>
+    // Verificar que haya token
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("No hay sesión activa. Inicia sesión primero.");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
