@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -36,73 +36,5 @@
     });
   </script>
 </body>
-</html> -->
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Inicio</title>
-</head>
-<body>
-  <h2>Bienvenido</h2>
-
-  <h3>Productos</h3>
-  <pre id="productos"></pre>
-
-  <h3>Usuarios</h3>
-  <pre id="usuarios"></pre>
-
-  <script>
-    async function cargarProductos() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("No hay token, inicia sesión primero");
-        window.location.href = "login.html";
-        return;
-      }
-
-      try {
-        const res = await fetch("/productos", {
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-        });
-        const data = await res.json();
-        document.getElementById("productos").textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        console.error("Error cargando productos:", err);
-      }
-    }
-
-    async function cargarUsuarios() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("No hay token, inicia sesión primero");
-        window.location.href = "login.html";
-        return;
-      }
-
-      try {
-        const res = await fetch("/usuarios", {
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-        });
-        const data = await res.json();
-        document.getElementById("usuarios").textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        console.error("Error cargando usuarios:", err);
-      }
-    }
-
-    // Ejecutar al cargar la página
-    cargarProductos();
-    cargarUsuarios();
-  </script>
-</body>
-</html>
-
-
-
+</html> 
 
