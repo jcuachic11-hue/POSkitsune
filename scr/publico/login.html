@@ -18,7 +18,11 @@
       const usuario = document.getElementById('usuario').value;
       const password = document.getElementById('password').value;
 
-      const res = await fetch("http://localhost:3000/login", {
+      const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? "http://localhost:3000" 
+      : "https://poskitsune-production.up.railway.app/login.html";
+
+      const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, password })
