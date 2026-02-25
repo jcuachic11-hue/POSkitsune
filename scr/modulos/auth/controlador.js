@@ -4,42 +4,38 @@ async function login(req, res) {
     try {
         const { usuario, password } = req.body;
 
-        // 1. Verificación de que el body no llegue vacío
+        // Validación básica
         if (!usuario || !password) {
-            return res.status(400).json({ error: "Faltan datos (usuario/password)" });
+            return res.status(400).json({ error: true, mensaje: "Usuario y contraseña requeridos" });
         }
 
-        // 2. Consulta a la DB usando execute
-        // Usamos [filas] para desestructurar el resultado de la promesa
+        // Consulta a la base de datos
         const [filas] = await db.execute('SELECT * FROM usuarios WHERE usuario = ?', [usuario]);
 
-        // 3. Verificamos si existe el usuario
         if (filas.length === 0) {
-            return res.status(401).json({ error: "Usuario no encontrado" });
+            return res.status(401).json({ error: true, mensaje: "El usuario no existe" });
         }
 
         const user = filas[0];
 
-        // 4. Comparación directa (Texto plano, sin bcrypt)
+        // Verificación de contraseña (asumiendo texto plano según tus datos)
         if (password === user.password) {
             return res.status(200).json({
                 error: false,
-                mensaje: "Bienvenido",
-                id: user.id
+                mensaje: "Autenticación exitosa",
+                usuario: user.usuario
             });
         } else {
-            return res.status(401).json({ error: "Contraseña incorrecta" });
+            return res.status(401).json({ error: true, mensaje: "Contraseña incorrecta" });
         }
 
     } catch (err) {
-        // Esto imprimirá el error real en los logs de Railway
-        console.error("ERROR EN EL PROCESO DE LOGIN:", err);
-
-        // Esto te enviará el error real al navegador (F12 -> Network -> Response)
+        console.error("Error en Login:", err);
+        // Devolvemos JSON siempre, para que el frontend no rompa
         return res.status(500).json({ 
-            error: "Error interno", 
-            mensaje: err.message, 
-            codigo: err.code 
+            error: true, 
+            mensaje: "Error interno del servidor",
+            detalles: err.message 
         });
     }
 }
