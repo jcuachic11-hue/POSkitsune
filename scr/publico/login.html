@@ -1,14 +1,14 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login - POS Kitsune</title>
 </head>
 <body>
   <h2>Iniciar Sesión</h2>
   <form id="loginForm">
-    <label>Usuario: <input type="text" id="usuario"></label><br>
-    <label>Contraseña: <input type="password" id="password"></label><br>
+    <label>Usuario: <input type="text" id="usuario" required></label><br>
+    <label>Contraseña: <input type="password" id="password" required></label><br>
     <button type="submit">Entrar</button>
   </form>
 
@@ -18,27 +18,31 @@
       const usuario = document.getElementById('usuario').value;
       const password = document.getElementById('password').value;
 
+      // DETECCIÓN AUTOMÁTICA DE URL
       const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? "http://localhost:3000" 
-      : "https://poskitsune-production.up.railway.app/login.html";
+        ? "http://localhost:3000" 
+        : "https://poskitsune-production.up.railway.app"; 
 
-      const res = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, password })
-      });
+      try {
+        const res = await fetch(`${API_URL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usuario, password })
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        // Redirigir al index
-        window.location.href = "index.html";
-      } else {
-        alert("Login incorrecto");
+        if (res.ok && data.token) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "index.html";
+        } else {
+          alert(data.message || "Login incorrecto");
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+        alert("No se pudo conectar con el servidor. Revisa los logs.");
       }
     });
   </script>
 </body>
-</html> 
-
+</html>

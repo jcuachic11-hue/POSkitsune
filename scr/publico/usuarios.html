@@ -25,7 +25,7 @@
   </form>
 
   <script>
-    const API_URL = 'http://localhost:3000/usuarios';
+    const API_URL = '/usuarios';
     const token = localStorage.getItem('token');
 
     async function cargarUsuarios() {
@@ -83,10 +83,10 @@
       cargarUsuarios();
     }
 
-    function editarUsuario(id, nombre, usuario, rol, estado) {
+    function editarUsuario(id, nombre, usuario, password, rol, estado) {
       document.getElementById('id').value = id;
       document.getElementById('nombre').value = nombre;
-      document.getElementById('password').value = password;
+      document.getElementById('password').value = '';
       document.getElementById('usuario').value = usuario;
       document.getElementById('rol').value = rol;
       document.getElementById('estado').value = estado;
