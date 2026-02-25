@@ -2,24 +2,49 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Menú Principal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Principal - POS Kitsune</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    .user-info { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    button { cursor: pointer; background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 10px 0; }
+    a { text-decoration: none; color: #1976d2; font-weight: bold; font-size: 1.1em; }
+    a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
-  <h2>Menú Principal</h2>
-  <p>Selecciona una opción:</p>
-  <ul>
-    <li><a href="productos.html">Gestión de Productos</a></li>
-    <li><a href="usuarios.html">Gestión de Usuarios</a></li>
-    <li><a href="ventas.html">Módulo de Ventas</a></li>
+  
+  <div class="user-info">
+    <span>Bienvenido: <strong id="nombreUsuario"></strong></span>
+    <button onclick="cerrarSesion()">Cerrar Sesión</button>
+  </div>
 
+  <h2>Menú Principal</h2>
+  <p>Selecciona una opción para administrar el sistema:</p>
+  <ul>
+    <li><a href="productos.html">📦 Gestión de Productos</a></li>
+    <li><a href="usuarios.html">👥 Gestión de Usuarios</a></li>
+    <li><a href="ventas.html">💰 Módulo de Ventas</a></li>
   </ul>
 
   <script>
-    // Verificar que haya token
-    const token = localStorage.getItem("token");
-    if (!token) {
+    // 1. CAMBIO CLAVE: Buscamos "usuario" en lugar de "token"
+    const usuarioLogueado = localStorage.getItem("usuario");
+
+    if (!usuarioLogueado) {
       alert("No hay sesión activa. Inicia sesión primero.");
       window.location.href = "login.html";
+    } else {
+      // Ponemos el nombre del usuario en el HTML
+      document.getElementById('nombreUsuario').innerText = usuarioLogueado;
+    }
+
+    // 2. FUNCIÓN PARA CERRAR SESIÓN
+    function cerrarSesion() {
+      localStorage.removeItem("usuario"); // Borramos la sesión
+      window.location.href = "login.html"; // Al login
     }
   </script>
 </body>
