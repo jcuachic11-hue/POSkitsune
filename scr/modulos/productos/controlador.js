@@ -1,58 +1,36 @@
-const conexion = require('../../bd/mysql');
+const db = require('../../bd/mysql');
 
-// Listar productos
-exports.listarProductos = async (req, res) => {
+async function todos(req, res) {
     try {
-        const [rows] = await conexion.query(
-            'SELECT id, nombre, descripcion, precio, stock, categoria FROM productos'
+        const [filas] = await db.execute('SELECT * FROM productos');
+        res.json(filas);
+    } catch (err) {
+        res.status(500).json({ error: true, mensaje: err.message });
+    }
+}
+
+async function agregar(req, res) {
+    try {
+        const { nombre, precio, stock } = req.body;
+        
+        // Validación simple
+        if (!nombre || !precio) {
+            return res.status(400).json({ error: true, mensaje: "Faltan campos obligatorios" });
+        }
+
+        await db.execute(
+            'INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)',
+            [nombre, precio, stock || 0]
         );
-        res.json(rows);
+
+        res.status(201).json({ error: false, mensaje: "Producto guardado con éxito" });
     } catch (err) {
-        res.status(500).json({ error: err });
+        console.error(err);
+        res.status(500).json({ error: true, mensaje: "Error al guardar: " + err.message });
     }
-};
+}
 
-// Crear producto
-exports.crearProducto = async (req, res) => {
-
-    const { nombre, descripcion, precio, stock, categoria } = req.body;
-    console.log('req.body', req.body);
-
-    try {
-        const precioFloat = parseFloat(precio);   
-        const stockInt = parseInt(stock, 10); 
-        const [result] = await conexion.query(
-            'INSERT INTO productos (nombre, descripcion, precio, stock, categoria) VALUES (?, ?, ?, ?, ?)',
-            [nombre, descripcion, precioFloat, stockInt, categoria]
-        );
-        res.json({ id: result.insertId, nombre, descripcion, precio: precioFloat, stock: stockInt, categoria });
-    } catch (err) {
-        res.status(500).json({ error: err });
-    }
-};
-
-// Actualizar producto
-exports.actualizarProducto = async (req, res) => {
-    const { id } = req.params;
-    const { nombre, descripcion, precio, stock, categoria } = req.body;
-    try {
-        await conexion.query(
-            'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria=? WHERE id=?',
-            [nombre, descripcion, precio, stock, categoria, id]
-        );
-        res.json({ id, nombre, descripcion, precio, stock, categoria });
-    } catch (err) {
-        res.status(500).json({ error: err });
-    }
-};
-
-// Eliminar producto
-exports.eliminarProducto = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await conexion.query('DELETE FROM productos WHERE id=?', [id]);
-        res.json({ mensaje: 'Producto eliminado' });
-    } catch (err) {
-        res.status(500).json({ error: err });
-    }
+module.exports = {
+    todos,
+    agregar
 };
