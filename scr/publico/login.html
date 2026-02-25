@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - POS Kitsune</title>
 </head>
 <body>
@@ -32,15 +33,21 @@
 
         const data = await res.json();
 
-        if (res.ok && data.token) {
-          localStorage.setItem("token", data.token);
-          window.location.href = "index.html";
+        // CORRECCIÓN: Tu servidor envía 'error: false' cuando es correcto
+        // Y los datos están en 'data.mensaje' y 'data.usuario'
+        if (res.ok && data.error === false) {
+          // Guardamos el nombre de usuario ya que no estás usando tokens todavía
+          localStorage.setItem("usuario", data.usuario);
+          
+          alert("¡Bienvenido, " + data.usuario + "!");
+          window.location.href = "index.html"; 
         } else {
-          alert(data.message || "Login incorrecto");
+          // Si el servidor mandó un error, usamos el mensaje que viene de la DB
+          alert(data.mensaje || "Login incorrecto");
         }
       } catch (error) {
         console.error("Error de conexión:", error);
-        alert("No se pudo conectar con el servidor. Revisa los logs.");
+        alert("No se pudo conectar con el servidor. Revisa la consola (F12).");
       }
     });
   </script>
