@@ -1,55 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - POS Kitsune</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - POS Kitsune</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #f4f4f4; padding: 10px 20px; border-radius: 8px; }
+        button { cursor: pointer; padding: 8px 16px; background: #ff4444; color: white; border: none; border-radius: 4px; }
+    </style>
 </head>
 <body>
-  <h2>Iniciar Sesión</h2>
-  <form id="loginForm">
-    <label>Usuario: <input type="text" id="usuario" required></label><br>
-    <label>Contraseña: <input type="password" id="password" required></label><br>
-    <button type="submit">Entrar</button>
-  </form>
 
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const usuario = document.getElementById('usuario').value;
-      const password = document.getElementById('password').value;
+    <div class="header">
+        <h1>Bienvenido al POS Kitsune</h1>
+        <div>
+            <span id="displayUsuario" style="font-weight: bold; margin-right: 15px;"></span>
+            <button onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+    </div>
 
-      // DETECCIÓN AUTOMÁTICA DE URL
-      const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? "http://localhost:3000" 
-        : "https://poskitsune-production.up.railway.app"; 
+    <div style="margin-top: 20px;">
+        <h3>Panel de Control</h3>
+        <p>Has ingresado correctamente al sistema.</p>
+        </div>
 
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ usuario, password })
-        });
+    <script>
+        // 1. VERIFICACIÓN DE SESIÓN (OBLIGATORIO)
+        // Buscamos 'usuario' porque así lo guardamos en el login.html corregido
+        const usuarioLogueado = localStorage.getItem("usuario");
 
-        const data = await res.json();
-
-        // CORRECCIÓN: Tu servidor envía 'error: false' cuando es correcto
-        // Y los datos están en 'data.mensaje' y 'data.usuario'
-        if (res.ok && data.error === false) {
-          // Guardamos el nombre de usuario ya que no estás usando tokens todavía
-          localStorage.setItem("usuario", data.usuario);
-          
-          alert("¡Bienvenido, " + data.usuario + "!");
-          window.location.href = "index.html"; 
+        if (!usuarioLogueado) {
+            // Si no hay nada guardado, lo mandamos al login inmediatamente
+            alert("No hay sesión activa. Inicia sesión primero.");
+            window.location.href = "login.html";
         } else {
-          // Si el servidor mandó un error, usamos el mensaje que viene de la DB
-          alert(data.mensaje || "Login incorrecto");
+            // Si existe, lo mostramos en pantalla
+            document.getElementById('displayUsuario').innerText = "Usuario: " + usuarioLogueado;
+            console.log("Acceso concedido a: " + usuarioLogueado);
         }
-      } catch (error) {
-        console.error("Error de conexión:", error);
-        alert("No se pudo conectar con el servidor. Revisa la consola (F12).");
-      }
-    });
-  </script>
+
+        // 2. FUNCIÓN PARA SALIR
+        function cerrarSesion() {
+            // Borramos el dato para que el guardia (el código de arriba) lo detenga la próxima vez
+            localStorage.removeItem("usuario");
+            window.location.href = "login.html";
+        }
+    </script>
 </body>
 </html>
