@@ -1,36 +1,30 @@
-const conexion = require('../../bd/mysql');
-const jwt = require('jsonwebtoken');
+// /app/scr/modulos/auth/controlador.js
 
-async function login(req, res) {
-  const { usuario, password } = req.body;
-  try {
-    const [rows] = await conexion.query(
-      'SELECT * FROM usuarios WHERE usuario = ?',
-      [usuario]
-    );
+async function login(usuarioEntrante, passwordEntrante) {
+    try {
+        // IMPORTANTE: El [filas] entre corchetes es vital en mysql2/promise
+        const [filas] = await db.query('SELECT * FROM usuarios WHERE usuario = ?', [usuarioEntrante]);
 
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'Usuario no encontrado' });
+        // Si no hay filas, el usuario no existe
+        if (!filas || filas.length === 0) {
+            console.log("Usuario no encontrado en la DB");
+            return null; 
+        }
+
+        const user = filas[0];
+
+        // Comparación directa (sin bcrypt)
+        if (passwordEntrante === user.password) {
+            console.log("Login exitoso");
+            return user;
+        } else {
+            console.log("Contraseña incorrecta");
+            return null;
+        }
+
+    } catch (error) {
+        // Esto imprimirá el error exacto en los LOGS de Railway para que no adivinemos
+        console.error("ERROR CRÍTICO EN SQL:", error.sqlMessage || error.message);
+        throw error; 
     }
-
-    const user = rows[0];
-
-    if (password !== user.password) {
-      return res.status(401).json({ error: 'Contraseña incorrecta' });
-    }
-
-    //token 
-    const token = jwt.sign(
-      { id: user.id, usuario: user.usuario, rol: user.rol },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    res.json({ mensaje: 'Login exitoso', token });
-  } catch (error) {
-    console.error('Error de login:', error.message, error.stack);
-    res.status(500).json({ error: 'Error interno en login' });
-  }
 }
-
-module.exports = { login };
